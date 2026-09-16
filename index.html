@@ -6,7 +6,7 @@
     <title>SVZ Checklisten Tool</title>
     <style>
         :root {
-            --surface-color: rgba(30, 41, 59, 0.85); /* Leicht transparent für Glas-Effekt */
+            --surface-color: rgba(30, 41, 59, 0.85);
             --primary-color: #3b82f6;
             --primary-hover: #2563eb;
             --text-main: #f8fafc;
@@ -22,7 +22,6 @@
         }
 
         body {
-            /* Moderner Farbverlauf im Hintergrund */
             background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
             color: var(--text-main);
             display: flex;
@@ -39,11 +38,12 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 20px;
             width: 100%;
-            max-width: 500px;
+            max-width: 550px; /* Leicht breiter für die Liste */
             padding: 35px 25px;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             display: flex;
             flex-direction: column;
+            max-height: 90vh; /* Verhindert, dass es auf kleinen Bildschirmen abgeschnitten wird */
         }
 
         h1 {
@@ -53,6 +53,7 @@
             color: var(--text-main);
             border-bottom: 2px solid var(--primary-color);
             padding-bottom: 15px;
+            flex-shrink: 0;
         }
 
         /* Menu View */
@@ -60,6 +61,7 @@
             display: flex;
             flex-direction: column;
             gap: 15px;
+            overflow-y: auto;
         }
 
         .menu-btn {
@@ -94,13 +96,15 @@
             display: none;
             flex-direction: column;
             flex-grow: 1;
+            overflow: hidden;
         }
 
         .header-nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
+            flex-shrink: 0;
         }
 
         .back-btn {
@@ -129,20 +133,48 @@
 
         #checklist-title {
             font-size: 1.4rem;
-            margin-bottom: 25px;
+            margin-bottom: 15px;
             text-align: center;
             color: var(--text-main);
+            flex-shrink: 0;
         }
 
-        .step-container {
-            background-color: rgba(0, 0, 0, 0.2);
-            padding: 30px 20px;
-            border-radius: 12px;
-            margin-bottom: 30px;
-            flex-grow: 1;
+        /* Liste der Schritte mit Scrollbar */
+        .steps-list {
             display: flex;
-            align-items: center;
+            flex-direction: column;
+            gap: 12px;
+            overflow-y: auto;
+            padding-right: 5px;
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+
+        /* Custom Scrollbar für die Liste */
+        .steps-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        .steps-list::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        .steps-list::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 10px;
+        }
+
+        .step-item {
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 12px;
             border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .step-item.checked {
+            background-color: rgba(16, 185, 129, 0.1); /* Leicht grünlicher Hintergrund */
+            border-color: rgba(16, 185, 129, 0.3);
+            opacity: 0.7;
         }
 
         /* Custom Checkbox Design */
@@ -155,13 +187,13 @@
         }
 
         .checkbox-wrapper input[type="checkbox"] {
-            display: none; /* Versteckt die Standard-Checkbox */
+            display: none;
         }
 
         .custom-checkbox {
-            width: 35px;
-            height: 35px;
-            border: 3px solid var(--primary-color);
+            width: 30px;
+            height: 30px;
+            border: 2px solid var(--primary-color);
             border-radius: 8px;
             display: flex;
             align-items: center;
@@ -174,33 +206,33 @@
         .checkbox-wrapper input[type="checkbox"]:checked + .custom-checkbox {
             background-color: var(--success-color);
             border-color: var(--success-color);
-            transform: scale(1.05);
         }
 
         .checkbox-wrapper input[type="checkbox"]:checked + .custom-checkbox::after {
             content: "✓";
             color: white;
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             font-weight: bold;
         }
 
-        #step-text {
-            font-size: 1.2rem;
-            line-height: 1.6;
+        .step-text {
+            font-size: 1.1rem;
+            line-height: 1.5;
             color: var(--text-main);
-            transition: opacity 0.2s;
+            transition: all 0.3s;
         }
         
-        .checkbox-wrapper input[type="checkbox"]:checked ~ #step-text {
-            opacity: 0.7;
+        .step-item.checked .step-text {
+            text-decoration: line-through;
+            color: var(--text-muted);
         }
 
         /* Buttons */
         .next-btn {
-            background-color: var(--primary-color);
+            background-color: var(--success-color);
             color: white;
             border: none;
-            padding: 20px;
+            padding: 18px;
             border-radius: 12px;
             font-size: 1.2rem;
             font-weight: bold;
@@ -208,10 +240,11 @@
             transition: all 0.3s;
             width: 100%;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            flex-shrink: 0;
         }
 
         .next-btn:hover:not(:disabled) {
-            background-color: var(--primary-hover);
+            background-color: #059669;
             transform: translateY(-2px);
         }
 
@@ -221,14 +254,6 @@
             cursor: not-allowed;
             box-shadow: none;
             transform: none;
-        }
-
-        .next-btn.finish {
-            background-color: var(--success-color);
-        }
-        
-        .next-btn.finish:hover:not(:disabled) {
-            background-color: #059669;
         }
 
         /* Success View */
@@ -279,24 +304,20 @@
             <button class="menu-btn" onclick="startChecklist('spaet')">Ende Spätschicht</button>
         </div>
 
-        <!-- Checklisten Ansicht -->
+        <!-- Checklisten Ansicht (Listenformat) -->
         <div id="checklist-view">
             <div class="header-nav">
                 <button class="back-btn" onclick="showMenu()">← Zurück</button>
-                <div class="progress" id="progress-text">Schritt 1/5</div>
+                <div class="progress" id="progress-text">0/0 Erledigt</div>
             </div>
             
             <h2 id="checklist-title">Titel</h2>
             
-            <div class="step-container">
-                <label class="checkbox-wrapper">
-                    <input type="checkbox" id="step-checkbox" onchange="toggleNextButton()">
-                    <div class="custom-checkbox"></div>
-                    <p id="step-text">Schritt Beschreibung hier...</p>
-                </label>
+            <div class="steps-list" id="steps-list">
+                <!-- Schritte werden hier via JavaScript generiert -->
             </div>
             
-            <button id="next-btn" class="next-btn" onclick="nextStep()" disabled>Bestätigen & Weiter</button>
+            <button id="finish-btn" class="next-btn" onclick="finishChecklist()" disabled>Checkliste abschliessen</button>
         </div>
 
         <!-- Erfolgs Ansicht (Alles erledigt) -->
@@ -304,7 +325,7 @@
             <div class="success-icon">✅</div>
             <h2>Alles erledigt!</h2>
             <p>Die Checkliste wurde erfolgreich abgearbeitet.</p>
-            <button class="next-btn" onclick="showMenu()">Zurück zur Startseite</button>
+            <button class="next-btn" style="background-color: var(--primary-color);" onclick="showMenu()">Zurück zur Startseite</button>
         </div>
     </div>
 
@@ -363,62 +384,68 @@
             }
         };
 
-        let currentList = [];
-        let currentIndex = 0;
-
         function startChecklist(id) {
             const checklist = data[id];
-            currentList = checklist.steps;
-            currentIndex = 0;
             
+            // Titel setzen
             document.getElementById('checklist-title').innerText = checklist.title;
             
+            // Liste generieren
+            const stepsListDiv = document.getElementById('steps-list');
+            stepsListDiv.innerHTML = ''; // Vorherige Liste leeren
+            
+            checklist.steps.forEach((step, index) => {
+                const stepHtml = `
+                    <label class="checkbox-wrapper step-item" id="step-item-${index}">
+                        <input type="checkbox" class="step-checkbox" onchange="checkProgress()">
+                        <div class="custom-checkbox"></div>
+                        <p class="step-text">${step}</p>
+                    </label>
+                `;
+                stepsListDiv.insertAdjacentHTML('beforeend', stepHtml);
+            });
+            
+            // Ansichten wechseln
             document.getElementById('menu-view').style.display = 'none';
             document.getElementById('success-view').style.display = 'none';
             document.getElementById('checklist-view').style.display = 'flex';
             
-            updateView();
+            // Initialen Fortschritt prüfen (sollte 0 sein)
+            checkProgress();
         }
 
-        function toggleNextButton() {
-            const checkbox = document.getElementById('step-checkbox');
-            const nextBtn = document.getElementById('next-btn');
-            // Button aktivieren, wenn Checkbox gesetzt ist
-            nextBtn.disabled = !checkbox.checked;
-        }
-
-        function updateView() {
-            // Text und Fortschritt aktualisieren
-            document.getElementById('step-text').innerText = currentList[currentIndex];
-            document.getElementById('progress-text').innerText = `Schritt ${currentIndex + 1}/${currentList.length}`;
+        function checkProgress() {
+            const checkboxes = document.querySelectorAll('.step-checkbox');
+            const totalSteps = checkboxes.length;
+            let checkedSteps = 0;
             
-            // Checkbox zurücksetzen
-            const checkbox = document.getElementById('step-checkbox');
-            checkbox.checked = false;
+            // Durch alle Checkboxen iterieren und Status überprüfen
+            checkboxes.forEach((cb, index) => {
+                const itemDiv = document.getElementById(`step-item-${index}`);
+                if (cb.checked) {
+                    checkedSteps++;
+                    itemDiv.classList.add('checked');
+                } else {
+                    itemDiv.classList.remove('checked');
+                }
+            });
             
-            // Button Zustand aktualisieren
-            toggleNextButton();
-
-            // Button Beschriftung anpassen, falls letzter Schritt
-            const btn = document.getElementById('next-btn');
-            if (currentIndex === currentList.length - 1) {
-                btn.innerText = "Abschliessen";
-                btn.classList.add('finish');
+            // Text aktualisieren
+            document.getElementById('progress-text').innerText = `${checkedSteps}/${totalSteps} Erledigt`;
+            
+            // Button aktivieren, wenn alle Checkboxen angewählt sind
+            const finishBtn = document.getElementById('finish-btn');
+            if (checkedSteps === totalSteps) {
+                finishBtn.disabled = false;
             } else {
-                btn.innerText = "Bestätigen & Weiter";
-                btn.classList.remove('finish');
+                finishBtn.disabled = true;
             }
         }
 
-        function nextStep() {
-            if (currentIndex < currentList.length - 1) {
-                currentIndex++;
-                updateView();
-            } else {
-                // Checkliste beendet, zeige Erfolgs-Screen
-                document.getElementById('checklist-view').style.display = 'none';
-                document.getElementById('success-view').style.display = 'flex';
-            }
+        function finishChecklist() {
+            // Zeige Erfolgs-Screen
+            document.getElementById('checklist-view').style.display = 'none';
+            document.getElementById('success-view').style.display = 'flex';
         }
 
         function showMenu() {
