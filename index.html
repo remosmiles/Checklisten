@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVZ Checklisten Tool</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --surface-color: #1e293b;
+            --primary-color: #3b82f6;
+            --primary-hover: #2563eb;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --success-color: #10b981;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: var(--surface-color);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 500px;
+            padding: 30px 20px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1.8rem;
+            color: var(--text-main);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+        }
+
+        /* Menu View */
+        #menu-view {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .menu-btn {
+            background-color: var(--surface-color);
+            color: var(--text-main);
+            border: 2px solid var(--primary-color);
+            padding: 18px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .menu-btn:hover {
+            background-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .menu-btn::after {
+            content: "➔";
+            font-size: 1.2rem;
+        }
+
+        /* Checklist View */
+        #checklist-view {
+            display: none;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .header-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1rem;
+            cursor: pointer;
+            padding: 5px 10px;
+            margin-left: -10px;
+        }
+
+        .back-btn:hover {
+            color: var(--text-main);
+        }
+
+        .progress {
+            font-size: 0.9rem;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        #checklist-title {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            text-align: center;
+            color: var(--text-main);
+        }
+
+        .step-container {
+            background-color: var(--bg-color);
+            padding: 30px 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #334155;
+        }
+
+        #step-text {
+            font-size: 1.25rem;
+            line-height: 1.5;
+            text-align: center;
+        }
+
+        .next-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 20px;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            width: 100%;
+        }
+
+        .next-btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .next-btn.finish {
+            background-color: var(--success-color);
+        }
+        
+        .next-btn.finish:hover {
+            background-color: #059669;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Hauptmenü -->
+        <div id="menu-view">
+            <h1>Checklisten</h1>
+            <button class="menu-btn" onclick="startChecklist('t20')">Tunnelsperrung 20:00 Uhr</button>
+            <button class="menu-btn" onclick="startChecklist('t21')">Tunnelsperrung 21:00 Uhr</button>
+            <button class="menu-btn" onclick="startChecklist('frueh')">Beginn Frühschicht</button>
+            <button class="menu-btn" onclick="startChecklist('spaet')">Ende Spätschicht</button>
+        </div>
+
+        <!-- Checklisten Ansicht -->
+        <div id="checklist-view">
+            <div class="header-nav">
+                <button class="back-btn" onclick="showMenu()">← Zurück</button>
+                <div class="progress" id="progress-text">Schritt 1/5</div>
+            </div>
+            
+            <h2 id="checklist-title">Titel</h2>
+            
+            <div class="step-container">
+                <p id="step-text">Schritt Beschreibung hier...</p>
+            </div>
+            
+            <button id="next-btn" class="next-btn" onclick="nextStep()">Weiter</button>
+        </div>
+    </div>
+
+    <script>
+        // Checklisten-Daten
+        const data = {
+            t20: {
+                title: "Tunnelsperrung 20:00 Uhr",
+                steps: [
+                    "19.00-19.30 Uhr Kontrolle unterbrechen",
+                    "Ca. 19.15 Uhr Ableitung ausschalten",
+                    "Ca. 19.30 Uhr Ableitung wieder einschalten jedoch S geradeaus fahren lassen bis max. 19.40 Uhr",
+                    "19.30 Uhr Anlage auf Rot schalten (0 Fz/Min), Abfahrtsraum auch auf Rot schalten",
+                    "19.40 Uhr bei Ableitung mit Manuell S wieder über Platz fahren lassen, Anzahl Fz eintragen"
+                ]
+            },
+            t21: {
+                title: "Tunnelsperrung 21:00 Uhr",
+                steps: [
+                    "20.00-20.30 Uhr Kontrolle unterbrechen",
+                    "Ca. 20.15 Uhr Ableitung ausschalten",
+                    "Ca. 19.30 Uhr Ableitung wieder einschalten jedoch S geradeaus fahren lassen bis max. 20.40 Uhr",
+                    "20.30 Uhr Anlage auf Rot schalten (0 Fz/Min) bei Abfahrtsraum auch S auf Rot",
+                    "20.40 Uhr bei Ableitung mit Manuell S wieder über Platz fahren lassen schalten/Anzahl Fz eintrag"
+                ]
+            },
+            frueh: {
+                title: "Beginn Frühschicht",
+                steps: [
+                    "Alarm quittieren: Betriebsart anwesend; 7100 ok",
+                    "Anlage einschalten: BZ Anlage ein, Fahrspuren Bahn 4 + 5 auf aktiv Wahl stellen, Dosierung «0»!",
+                    "Telefon Umleitung ausschalten",
+                    "Ableitung einschalten: LKW Rtg. Süd (rechts oben) Zufahrt „S“ via PKO, nicht vor 05.00 Uhr, VD via Funk informieren, Dosierung 3 FZ/Min inkl. «S»",
+                    "SVZ-Journal Schichtbeginn eintragen",
+                    "Briefing-Liste ausfüllen (aus Avanti übernehmen)",
+                    "Türen zur Schalterhalle öffnen (nicht vor 05.00 Uhr)",
+                    "Schränke im Inkasso öffnen"
+                ]
+            },
+            spaet: {
+                title: "Ende Spätschicht",
+                steps: [
+                    "Ca. 21:00 Uhr „S“ ausschalten (Zufahrt - Steuerung Wahl stellen oder direkt am Signal auf manuell), VD am Einweisposten informieren",
+                    "Ab 22:00 Uhr Ableitung ausschalten, Bahn 4 + 5 sperren, Dosierung «0»",
+                    "SVZ-Journal ausfüllen (Platzbelegung eintragen)",
+                    "Übernachter-Statistik ausfüllen",
+                    "Parkplatzbelegung in der BSA korrigieren",
+                    "22:30 Uhr Anlage ausschalten. Am Sa. vor dem Ausschalten Torschliessung aktivieren! (auf Tor klicken Programm Zeit eingeben 22.30 aktivieren). Tor südlich TKO öffnen (nur am Samstag)",
+                    "Telefon umschalten. Umleitung am Abend: 4 x variable Umleitung 5311 ok",
+                    "Tagesabschluss KK Geräte machen",
+                    "WC in Schalterhalle kontrollieren",
+                    "Schränke im Inkasso abschliessen",
+                    "Licht in Schalterhalle löschen",
+                    "Eingang (Chauffeure) schliessen"
+                ]
+            }
+        };
+
+        let currentList = [];
+        let currentIndex = 0;
+
+        function startChecklist(id) {
+            const checklist = data[id];
+            currentList = checklist.steps;
+            currentIndex = 0;
+            
+            document.getElementById('checklist-title').innerText = checklist.title;
+            
+            document.getElementById('menu-view').style.display = 'none';
+            document.getElementById('checklist-view').style.display = 'flex';
+            
+            updateView();
+        }
+
+        function updateView() {
+            document.getElementById('step-text').innerText = currentList[currentIndex];
+            document.getElementById('progress-text').innerText = `Schritt ${currentIndex + 1}/${currentList.length}`;
+            
+            const btn = document.getElementById('next-btn');
+            if (currentIndex === currentList.length - 1) {
+                btn.innerText = "Checkliste abschliessen";
+                btn.classList.add('finish');
+            } else {
+                btn.innerText = "Weiter";
+                btn.classList.remove('finish');
+            }
+        }
+
+        function nextStep() {
+            if (currentIndex < currentList.length - 1) {
+                currentIndex++;
+                updateView();
+            } else {
+                // Checkliste beendet, zurück zum Menü
+                showMenu();
+            }
+        }
+
+        function showMenu() {
+            document.getElementById('checklist-view').style.display = 'none';
+            document.getElementById('menu-view').style.display = 'flex';
+        }
+    </script>
+</body>
+</html>
