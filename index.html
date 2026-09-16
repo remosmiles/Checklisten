@@ -3,15 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SVZ Checklisten Tool</title>
+    <title>SVZ Checklisten Tool - Kapo Uri</title>
     <style>
         :root {
-            --surface-color: rgba(30, 41, 59, 0.85);
-            --primary-color: #3b82f6;
-            --primary-hover: #2563eb;
-            --text-main: #f8fafc;
-            --text-muted: #cbd5e1;
-            --success-color: #10b981;
+            /* Bullenpower Uri Farbpalette */
+            --primary-color: #ffcb05; /* Kapo Uri Gelb */
+            --primary-hover: #e6b704;
+            --surface-color: rgba(20, 20, 20, 0.95);
+            --bg-dark: #0a0a0a;
+            --text-main: #ffffff;
+            --text-dark: #111111;
+            --text-muted: #a1a1aa;
+            --border-color: rgba(255, 203, 5, 0.3);
+            --success-color: #ffcb05; /* Gelb als Bestätigung für den Look */
         }
 
         * {
@@ -22,7 +26,8 @@
         }
 
         body {
-            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+            /* Dunkler, robuster Hintergrund */
+            background: linear-gradient(135deg, #1f1f1f 0%, #0a0a0a 100%);
             color: var(--text-main);
             display: flex;
             justify-content: center;
@@ -33,27 +38,40 @@
 
         .container {
             background-color: var(--surface-color);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
             width: 100%;
-            max-width: 550px; /* Leicht breiter für die Liste */
+            max-width: 550px;
             padding: 35px 25px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 203, 5, 0.1);
             display: flex;
             flex-direction: column;
-            max-height: 90vh; /* Verhindert, dass es auf kleinen Bildschirmen abgeschnitten wird */
+            max-height: 90vh;
+        }
+
+        .header-container {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 3px solid var(--primary-color);
+            padding-bottom: 15px;
+            flex-shrink: 0;
         }
 
         h1 {
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 1.8rem;
+            font-size: 2rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
             color: var(--text-main);
-            border-bottom: 2px solid var(--primary-color);
-            padding-bottom: 15px;
-            flex-shrink: 0;
+            margin-bottom: 5px;
+        }
+
+        .slogan {
+            font-size: 0.9rem;
+            color: var(--primary-color);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
         }
 
         /* Menu View */
@@ -65,25 +83,27 @@
         }
 
         .menu-btn {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.03);
             color: var(--text-main);
             border: 2px solid var(--primary-color);
             padding: 18px;
-            border-radius: 12px;
+            border-radius: 8px;
             font-size: 1.1rem;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
             text-align: left;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            text-transform: uppercase;
         }
 
         .menu-btn:hover {
             background-color: var(--primary-color);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.4);
+            color: var(--text-dark);
+            transform: scale(1.02);
+            box-shadow: 0 10px 15px -3px rgba(255, 203, 5, 0.3);
         }
 
         .menu-btn::after {
@@ -108,35 +128,41 @@
         }
 
         .back-btn {
-            background: rgba(255,255,255,0.1);
-            border: none;
-            border-radius: 8px;
-            color: var(--text-main);
-            font-size: 0.95rem;
+            background: transparent;
+            border: 1px solid var(--text-muted);
+            border-radius: 6px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
             cursor: pointer;
             padding: 8px 12px;
-            transition: background 0.2s;
+            transition: all 0.2s;
         }
 
         .back-btn:hover {
-            background: rgba(255,255,255,0.2);
+            background: var(--text-muted);
+            color: var(--text-dark);
         }
 
         .progress {
             font-size: 0.9rem;
-            color: #93c5fd;
-            font-weight: bold;
-            background: rgba(59, 130, 246, 0.2);
+            color: var(--text-dark);
+            font-weight: 800;
+            background: var(--primary-color);
             padding: 5px 12px;
-            border-radius: 20px;
+            border-radius: 6px;
+            text-transform: uppercase;
         }
 
         #checklist-title {
-            font-size: 1.4rem;
+            font-size: 1.5rem;
+            font-weight: 800;
             margin-bottom: 15px;
             text-align: center;
-            color: var(--text-main);
+            color: var(--primary-color);
             flex-shrink: 0;
+            text-transform: uppercase;
         }
 
         /* Liste der Schritte mit Scrollbar */
@@ -152,28 +178,28 @@
 
         /* Custom Scrollbar für die Liste */
         .steps-list::-webkit-scrollbar {
-            width: 6px;
+            width: 8px;
         }
         .steps-list::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
         }
         .steps-list::-webkit-scrollbar-thumb {
             background: var(--primary-color);
-            border-radius: 10px;
+            border-radius: 4px;
         }
 
         .step-item {
-            background-color: rgba(0, 0, 0, 0.2);
+            background-color: rgba(255, 255, 255, 0.03);
             padding: 15px;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
             transition: all 0.3s ease;
         }
 
         .step-item.checked {
-            background-color: rgba(16, 185, 129, 0.1); /* Leicht grünlicher Hintergrund */
-            border-color: rgba(16, 185, 129, 0.3);
+            background-color: rgba(255, 203, 5, 0.1);
+            border-color: var(--primary-color);
             opacity: 0.7;
         }
 
@@ -194,25 +220,26 @@
             width: 30px;
             height: 30px;
             border: 2px solid var(--primary-color);
-            border-radius: 8px;
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
             transition: all 0.2s ease;
             margin-top: 2px;
+            background: rgba(0,0,0,0.5);
         }
 
         .checkbox-wrapper input[type="checkbox"]:checked + .custom-checkbox {
-            background-color: var(--success-color);
-            border-color: var(--success-color);
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
         }
 
         .checkbox-wrapper input[type="checkbox"]:checked + .custom-checkbox::after {
             content: "✓";
-            color: white;
-            font-size: 1.2rem;
-            font-weight: bold;
+            color: var(--text-dark);
+            font-size: 1.3rem;
+            font-weight: 900;
         }
 
         .step-text {
@@ -220,6 +247,7 @@
             line-height: 1.5;
             color: var(--text-main);
             transition: all 0.3s;
+            font-weight: 500;
         }
         
         .step-item.checked .step-text {
@@ -229,28 +257,29 @@
 
         /* Buttons */
         .next-btn {
-            background-color: var(--success-color);
-            color: white;
+            background-color: var(--primary-color);
+            color: var(--text-dark);
             border: none;
             padding: 18px;
-            border-radius: 12px;
+            border-radius: 8px;
             font-size: 1.2rem;
-            font-weight: bold;
+            font-weight: 800;
+            text-transform: uppercase;
             cursor: pointer;
             transition: all 0.3s;
             width: 100%;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
             flex-shrink: 0;
         }
 
         .next-btn:hover:not(:disabled) {
-            background-color: #059669;
+            background-color: var(--primary-hover);
             transform: translateY(-2px);
         }
 
         .next-btn:disabled {
-            background-color: #475569;
-            color: #94a3b8;
+            background-color: #333333;
+            color: #666666;
             cursor: not-allowed;
             box-shadow: none;
             transform: none;
@@ -269,6 +298,7 @@
         .success-icon {
             font-size: 5rem;
             margin-bottom: 20px;
+            color: var(--primary-color);
             animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
             transform: scale(0);
         }
@@ -280,24 +310,32 @@
         }
 
         #success-view h2 {
-            font-size: 2rem;
+            font-size: 2.2rem;
+            font-weight: 900;
             margin-bottom: 10px;
-            color: var(--success-color);
+            color: var(--primary-color);
+            text-transform: uppercase;
         }
 
         #success-view p {
             margin-bottom: 30px;
-            color: var(--text-muted);
+            color: var(--text-main);
             font-size: 1.1rem;
+            font-weight: 500;
         }
     </style>
 </head>
 <body>
 
     <div class="container">
+        <!-- Header für alle Ansichten -->
+        <div class="header-container">
+            <h1>Checklisten</h1>
+            <div class="slogan">Dü fir yys - Miär fir Üri</div>
+        </div>
+
         <!-- Hauptmenü -->
         <div id="menu-view">
-            <h1>Checklisten</h1>
             <button class="menu-btn" onclick="startChecklist('t20')">Tunnelsperrung 20:00 Uhr</button>
             <button class="menu-btn" onclick="startChecklist('t21')">Tunnelsperrung 21:00 Uhr</button>
             <button class="menu-btn" onclick="startChecklist('frueh')">Beginn Frühschicht</button>
@@ -307,7 +345,7 @@
         <!-- Checklisten Ansicht (Listenformat) -->
         <div id="checklist-view">
             <div class="header-nav">
-                <button class="back-btn" onclick="showMenu()">← Zurück</button>
+                <button class="back-btn" onclick="showMenu()">Zurück</button>
                 <div class="progress" id="progress-text">0/0 Erledigt</div>
             </div>
             
@@ -317,15 +355,15 @@
                 <!-- Schritte werden hier via JavaScript generiert -->
             </div>
             
-            <button id="finish-btn" class="next-btn" onclick="finishChecklist()" disabled>Checkliste abschliessen</button>
+            <button id="finish-btn" class="next-btn" onclick="finishChecklist()" disabled>Abschliessen</button>
         </div>
 
         <!-- Erfolgs Ansicht (Alles erledigt) -->
         <div id="success-view">
-            <div class="success-icon">✅</div>
-            <h2>Alles erledigt!</h2>
-            <p>Die Checkliste wurde erfolgreich abgearbeitet.</p>
-            <button class="next-btn" style="background-color: var(--primary-color);" onclick="showMenu()">Zurück zur Startseite</button>
+            <div class="success-icon">🛡️</div>
+            <h2>Erledigt!</h2>
+            <p>Die Checkliste wurde erfolgreich und vollständig abgearbeitet.</p>
+            <button class="next-btn" onclick="showMenu()">Zur Startseite</button>
         </div>
     </div>
 
@@ -410,7 +448,7 @@
             document.getElementById('success-view').style.display = 'none';
             document.getElementById('checklist-view').style.display = 'flex';
             
-            // Initialen Fortschritt prüfen (sollte 0 sein)
+            // Initialen Fortschritt prüfen
             checkProgress();
         }
 
